@@ -46,10 +46,23 @@ public class WalksController : ControllerBase
 
     // Get Walks
     // GET: /api/walks
+    // GET: /api/walks?filterOn=Name&filterQuery=Track
+    // GET: /api/walks?filterOn=Name&filterQuery=Track&sortBy=Name&isAscending=true
+    // GET: /api/walks?filterOn=Name&filterQuery=Track&sortBy=Name&isAscending=true&pageNumber=1&pageSize=10
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(
+        [FromQuery] string? filterOn,
+        [FromQuery] string? filterQuery,
+        [FromQuery] string? sortBy,
+        [FromQuery] bool? isAscending,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 100)
     {
-        var walksDomainModel = await _walkRepository.GetAllAsync();
+        var walksDomainModel = await _walkRepository
+            .GetAllAsync(
+                filterOn, filterQuery,
+                sortBy, isAscending ?? true,
+                pageNumber, pageSize);
 
         // Map Domain to DTO
         var walkDto = _mapper.Map<List<WalkDto>>(walksDomainModel);
