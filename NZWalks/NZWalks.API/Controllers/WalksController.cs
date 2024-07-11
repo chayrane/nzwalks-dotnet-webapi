@@ -61,6 +61,8 @@ public class WalksController : ControllerBase
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 100)
     {
+        //throw new Exception("This is a sample exception to check exception middleware");
+
         var walksDomainModel = await _walkRepository
             .GetAllAsync(
                 filterOn, filterQuery,
