@@ -7,12 +7,24 @@ using Microsoft.OpenApi.Models;
 using NZWalks.API.Data;
 using NZWalks.API.Mappings;
 using NZWalks.API.Repositories;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Registering Serilog Logging
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File(
+        "Logs/NZWalks_Log.txt",
+        rollingInterval: RollingInterval.Minute)
+    .MinimumLevel.Information()
+    .CreateLogger();
 
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
+// Add HttpContextAccessor for accessing HttpContext in services
 builder.Services.AddHttpContextAccessor();
 
 // Registering NZWalks DbContext.
@@ -23,6 +35,7 @@ builder.Services.AddDbContext<NZWalksDbContext>(options =>
 builder.Services.AddDbContext<NZWalksAuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("NZWalksAuth")));
 
+// Add local services to the container.
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IWalkRepository, WalkRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
